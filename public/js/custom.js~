@@ -1,4 +1,0 @@
-function hideHeading (header)
-{
-  header.style.visibility = visible;
-}
