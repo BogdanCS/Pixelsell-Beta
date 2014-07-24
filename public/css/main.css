@@ -39,3 +39,9 @@ h2.hidden {
   border-color: #3b6ccd;
   position: absolute;
        }
+
+#priceCount {
+  position: absolute;
+  right : 0%;
+  bottom : 0%;
+       }
