@@ -6,7 +6,7 @@ function startDraw (evt)
   //alert ("Click position is " + x1Position + "," +  y1Position);
  
   // Reset from previous draw
-  var price = 1;
+  var price = 1; //to update - growing price
   var priceTag = $("<h2>1$</h2>");
   $("#priceCount").find("h2").remove();
   $("#cnt-button").prop('disabled', true);
@@ -69,6 +69,12 @@ function startDraw (evt)
   $("#select").on("mouseup", finishDraw);
 }
 
+function dialogWindow()
+{
+  $("#dialog").dialog("open");  
+}
+
+
 function selectMode()
 {
   // Show instructions
@@ -81,15 +87,25 @@ function selectMode()
   $(this).text("Confirm");
   $(this).prop('disabled', true);
   
+  // Change event handler on button
+  $(this).off("click", selectMode);
+  $(this).on("click", dialogWindow);
 
   // Enter select tool mode
   $("#select").on("mousedown", startDraw);
+
+  // to add - go back to previous mode
 }
 
 
 $(document).ready(function (){
  
+  // Maybe on load instead of ready?
   $("#cnt-button").prop('disabled', false);
+  $( "#dialog" ).dialog({ autoOpen: false,
+                          modal: true,
+                          draggable: true});
+
   $("#cnt-button").on("click", selectMode);
 
 });
