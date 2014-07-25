@@ -4,9 +4,13 @@ function startDraw (evt)
   var x1Position = evt.pageX;
   var y1Position = evt.pageY;
   //alert ("Click position is " + x1Position + "," +  y1Position);
+ 
+  // Reset from previous draw
   var price = 1;
   var priceTag = $("<h2>1$</h2>");
-
+  $("#priceCount").find("h2").remove();
+  $("#cnt-button").prop('disabled', true);
+ 
   function updateDraw (evt2)
   {
     var x2Position = evt2.pageX;
@@ -46,6 +50,9 @@ function startDraw (evt)
     $("#priceCount").find("h2").remove();
     $("#priceCount").append(priceTag);
 
+    //Enable button
+    $("#cnt-button").prop('disabled', false);
+
     // to add blocking stuff
   }
 
@@ -64,15 +71,25 @@ function startDraw (evt)
 
 function selectMode()
 {
+  // Show instructions
   $("#cnt").removeClass("hidden");
   $("#select").addClass("select-screen");
 
+  // Change button
+  $(this).removeClass("btn-primary");
+  $(this).addClass("btn-success");
+  $(this).text("Confirm");
+  $(this).prop('disabled', true);
+  
+
+  // Enter select tool mode
   $("#select").on("mousedown", startDraw);
 }
 
 
 $(document).ready(function (){
-
+ 
+  $("#cnt-button").prop('disabled', false);
   $("#cnt-button").on("click", selectMode);
 
 });
