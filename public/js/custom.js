@@ -71,7 +71,9 @@ function startDraw (evt)
 
 function dialogWindow()
 {
-  $("#dialog").dialog("open");  
+  $("#dialog").dialog("open");
+  $("#upload-button").on("click", function(){
+    $("#dialog").find("input").click();});  
 }
 
 
