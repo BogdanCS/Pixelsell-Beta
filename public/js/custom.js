@@ -73,7 +73,33 @@ function dialogWindow()
 {
   $("#dialog").dialog("open");
   $("#upload-button").on("click", function(){
-    $("#dialog").find("input").click();});  
+    $("#dialog").find("input").click();}); 
+ 
+ // submit event listener
+ $("#uploadForm").submit(function(){
+   $(this).ajaxSubmit({
+     error: function(xhr) 
+     {
+       status('Error'+ xhr.status);
+     }
+     success: function(response)
+     {
+     }
+   });
+   
+   // Stop the form for submitting so we avoid refresh
+   return false;
+ });
+ 
+ // Check for file
+ var timerId;
+ timerId = setInterval( function(){
+  if ($("#userPhotoInput").val() !== '')
+  {
+    clearInterval(timerId);
+    $("#uploadForm").submit();
+  },500);
+ 
 }
 
 
