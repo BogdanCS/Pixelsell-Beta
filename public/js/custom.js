@@ -4,13 +4,13 @@ function startDraw (evt)
   var x1Position = evt.pageX;
   var y1Position = evt.pageY;
   //alert ("Click position is " + x1Position + "," +  y1Position);
- 
+
   // Reset from previous draw
   var price = 1; //to update - growing price
   var priceTag = $("<h2>1$</h2>");
   $("#priceCount").find("h2").remove();
   $("#cnt-button").prop('disabled', true);
- 
+
   function updateDraw (evt2)
   {
     var x2Position = evt2.pageX;
@@ -72,34 +72,40 @@ function startDraw (evt)
 function dialogWindow()
 {
   $("#dialog").dialog("open");
-  $("#upload-button").on("click", function(){
-    $("#dialog").find("input").click();}); 
- 
- // submit event listener
- $("#uploadForm").submit(function(){
+  $("#upload-button").on("click", function(){$("#dialog").find("input").click();});
+
+  // Check for file
+  var timerId;
+  timerId = setInterval( function(){
+    console.log($("#userPhotoInput").val());
+    if ($("#userPhotoInput").val() !== '')
+    {
+      clearInterval(timerId);
+      console.log("SUBMITTED");
+      $("#uploadForm").submit();
+    }}, 500);
+
+  // submit event listener
+  $("#uploadForm").submit(function(){
+   
    $(this).ajaxSubmit({
-     error: function(xhr) 
+     error: function(xhr)
      {
-       status('Error'+ xhr.status);
-     }
+       console.log('Error'+ xhr.status);
+     },
      success: function(response)
      {
+       console.log(response.path);
+       var img = $("<img src=" + response.path + "></img>");
+       $("#dialog").append(img);
      }
    });
-   
+
    // Stop the form for submitting so we avoid refresh
    return false;
  });
- 
- // Check for file
- var timerId;
- timerId = setInterval( function(){
-  if ($("#userPhotoInput").val() !== '')
-  {
-    clearInterval(timerId);
-    $("#uploadForm").submit();
-  },500);
- 
+
+
 }
 
 
@@ -114,7 +120,7 @@ function selectMode()
   $(this).addClass("btn-success");
   $(this).text("Confirm");
   $(this).prop('disabled', true);
-  
+
   // Change event handler on button
   $(this).off("click", selectMode);
   $(this).on("click", dialogWindow);
@@ -127,13 +133,14 @@ function selectMode()
 
 
 $(document).ready(function (){
- 
+
   // Maybe on load instead of ready?
   $("#cnt-button").prop('disabled', false);
   $( "#dialog" ).dialog({ autoOpen: false,
-                          modal: true,
-                          draggable: true});
+			  modal: true,
+			  draggable: true});
 
   $("#cnt-button").on("click", selectMode);
+  $("#userPhotoInput").val('');
 
 });
