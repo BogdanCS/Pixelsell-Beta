@@ -17,10 +17,11 @@
 
     <div id="dialog" title="Upload your picture">
       <button type="button" class="btn btn-primary btn-lg" id="upload-button">Choose picture</button>
-      
       <form id="uploadForm" enctype="multipart/form-data" action="/images/user" method="post">
       <input type="file" class="hidden" id="userPhotoInput" name="userPhoto"/>
       </form>
+
+      <button type="button" class="btn btn-success btn-lg hidden" id="confirm-button">Post it</button>
     </div>
 
     <script src="/js/jquery-1.11.1.min.js"></script>
