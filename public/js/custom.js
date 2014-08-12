@@ -100,6 +100,7 @@ function dialogWindow()
      {
        console.log(response.path);
        var img = $("<img src=" + response.path + "></img>");
+       
        $("#dialog").find("#upload-button").after(img);
        $("#dialog").find("#confirm-button").removeClass("hidden");
        $("#confirm-button").on("click", function(){
@@ -145,11 +146,32 @@ function selectMode()
   // Enter select tool mode
   $("#select").on("mousedown", startDraw);
 
+  // Set price tag
+  $("#priceCount").text("");
+  $("#priceCount").removeClass("hidden");
+
   // to add - go back to previous mode
 }
 
+// Reverse function for selectMode
 function initialMode()
 {
+  $("#cnt").addClass("hidden");
+  $("#select").removeClass("select-screen");
+
+  $("#cnt-button").addClass("btn-primary");
+  $("#cnt-button").removeClass("btn-success");
+  $("#cnt-button").text("Take a chunk");
+  $("#cnt-button").prop('disabled', false);
+  
+  $("#cnt-button").on("click", selectMode);
+  $("#cnt-button").off("click", dialogWindow);
+
+  $("#select").off("mousedown", startDraw);
+  
+  $(".blueRct").css("position", "absolute");
+  $(".blueRct").removeClass("blueRct");
+  $("#priceCount").addClass("hidden");
 }
 
 $(document).ready(function (){
