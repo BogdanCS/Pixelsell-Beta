@@ -74,6 +74,9 @@ function dialogWindow()
   $("#dialog").dialog("open");
   $("#upload-button").on("click", function(){$("#dialog").find("input").click();});
 
+  // To add - change uploaded file
+  // To add - close dialog function
+
   // Check for file
   var timerId;
   timerId = setInterval( function(){
@@ -97,7 +100,22 @@ function dialogWindow()
      {
        console.log(response.path);
        var img = $("<img src=" + response.path + "></img>");
-       $("#dialog").append(img);
+       $("#dialog").find("#upload-button").after(img);
+       $("#dialog").find("#confirm-button").removeClass("hidden");
+       $("#confirm-button").on("click", function(){
+         // canvas filled with img
+         var canvas = $(".blueRct").get(0);
+         var ctx = canvas.getContext("2d");
+         var pat = ctx.createPattern(img.get(0), 'no-repeat');
+         ctx.rect(0,0,$(".blueRct").width(),$(".blueRct").height());
+         ctx.fillStyle = pat;
+         ctx.fill();
+         // close dialog
+         $("#dialog").dialog("close");
+         // img sent to server and edit html
+         // return to initial state
+         initialMode();
+       });
      }
    });
 
@@ -107,7 +125,6 @@ function dialogWindow()
 
 
 }
-
 
 function selectMode()
 {
@@ -131,6 +148,9 @@ function selectMode()
   // to add - go back to previous mode
 }
 
+function initialMode()
+{
+}
 
 $(document).ready(function (){
 
