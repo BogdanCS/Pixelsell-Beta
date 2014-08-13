@@ -2,6 +2,7 @@ var express = require ('express');
 var multer = require ('multer');
 var bodyParser = require('body-parser');
 var fs = require('fs');
+var async = require('async');
 
 var app = express();
 
@@ -37,6 +38,22 @@ app.post('/images/user/html', function(request, response)
   file.write(new Buffer(request.body.toWrite));
 });
 
+
+
 var port =process.env.PORT || 8080;
 app.listen(port, function()
 	  {console.log("Listening on " + port);});
+
+var timerId = setInterval( function(){
+  var path = __dirname + '/tmp/forIndex/';
+  fs.readdir(path, function(err, files){
+    async.mapLimit(files,1000,function(filename,cb){cb(null, path+filename);}, function(err, results){
+      console.log(results);
+      async.mapLimit(results,1000,fs.readFile, function(err, results){
+        console.log(results);
+        console.log(err);
+        // write results at pos in order     
+    });
+   });
+  });
+},1000);
