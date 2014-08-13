@@ -1,11 +1,12 @@
 var express = require ('express');
 var multer = require ('multer');
+var bodyParser = require('body-parser');
 var fs = require('fs');
 
 var app = express();
-var now = new Date();
 
 app.use(multer({ dest: './tmp/'}));
+app.use(bodyParser.urlencoded({extended : false}));
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(request, response)
@@ -14,7 +15,7 @@ app.get('/', function(request, response)
 
 app.post('/images/user', function(request, response)
 {
-  stamp = now.getTime();
+  stamp = Date.now();
   var serverPath = __dirname + '/public/images/user/user' + stamp + '.jpeg';
   var toReturnPath = '/images/user/user' + stamp + '.jpeg';
   fs.rename(request.files.userPhoto.path, serverPath,function(error)
@@ -26,6 +27,14 @@ app.post('/images/user', function(request, response)
 
       response.send({path: toReturnPath});
     });
+});
+
+app.post('/images/user/html', function(request, response)
+{
+  stamp = Date.now();
+  var toWritePath = __dirname + '/tmp/forIndex/file' + stamp + '.txt';
+  file = fs.createWriteStream( toWritePath, {flags: "a"});
+  file.write(new Buffer(request.body.toWrite));
 });
 
 var port =process.env.PORT || 8080;

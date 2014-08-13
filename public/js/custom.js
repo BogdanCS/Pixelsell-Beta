@@ -90,7 +90,7 @@ function dialogWindow()
 
   // submit event listener
   $("#uploadForm").submit(function(){
-   
+
    $(this).ajaxSubmit({
      error: function(xhr)
      {
@@ -100,22 +100,39 @@ function dialogWindow()
      {
        console.log(response.path);
        var img = $("<img src=" + response.path + "></img>");
-       
+
        $("#dialog").find("#upload-button").after(img);
        $("#dialog").find("#confirm-button").removeClass("hidden");
        $("#confirm-button").on("click", function(){
-         // canvas filled with img
-         var canvas = $(".blueRct").get(0);
-         var ctx = canvas.getContext("2d");
-         var pat = ctx.createPattern(img.get(0), 'no-repeat');
-         ctx.rect(0,0,$(".blueRct").width(),$(".blueRct").height());
-         ctx.fillStyle = pat;
-         ctx.fill();
-         // close dialog
-         $("#dialog").dialog("close");
-         // img sent to server and edit html
-         // return to initial state
-         initialMode();
+	 /* canvas filled with img
+	 var canvas = $(".blueRct").get(0);
+	 var ctx = canvas.getContext("2d");
+	 var pat = ctx.createPattern(img.get(0), 'no-repeat');
+	 ctx.rect(0,0,$(".blueRct").width(),$(".blueRct").height());
+	 ctx.fillStyle = pat;
+	 ctx.fill();*/
+
+	 // replace blueRct with img
+	 canvas = $(".blueRct");
+	 img.css({"position":"absolute",
+		  "top": canvas.css("top"),
+		  "left" : canvas.css("left"),
+		  "right" : canvas.css("right"),
+		  "bottom" : canvas.css("bottom")});
+	 img.width(canvas.width());
+	 img.height(canvas.height());
+	 img.addClass("toBeProcessed");
+	 canvas.remove();
+	 $("body").append(img);
+
+	 // close dialog
+	 $("#dialog").dialog("close");
+
+	 // img sent to server and edit html
+
+
+	 // return to initial state
+	 initialMode();
        });
      }
    });
@@ -163,14 +180,22 @@ function initialMode()
   $("#cnt-button").removeClass("btn-success");
   $("#cnt-button").text("Take a chunk");
   $("#cnt-button").prop('disabled', false);
-  
+
   $("#cnt-button").on("click", selectMode);
   $("#cnt-button").off("click", dialogWindow);
 
   $("#select").off("mousedown", startDraw);
-  
-  $(".blueRct").css("position", "absolute");
-  $(".blueRct").removeClass("blueRct");
+
+  // update HTML on server
+  var htmlToWrite = $(".toBeProcessed").get(0).outerHTML;
+  htmlToWrite = htmlToWrite.replace("toBeProcessed","");
+  // console.log(htmlToWrite);
+  $.ajax({ type: "POST",
+	   url: "/images/user/html",
+	   data: { "toWrite" : htmlToWrite }});
+  $(".toBeProcessed").removeClass("toBeProcessed");
+
+
   $("#priceCount").addClass("hidden");
 }
 
