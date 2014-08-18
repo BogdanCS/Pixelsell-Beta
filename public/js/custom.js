@@ -75,22 +75,37 @@ function dialogWindow()
   $("#upload-button").on("click", function(){$("#dialog").find("input").click();});
 
   // To add - change uploaded file
-  // To add - close dialog function
 
-  // Check for file
-  var timerId;
-  timerId = setInterval( function(){
+  // close dialog function
+  $("#dialog").on("dialogclose", function(evt, ui){
+  if ( $("#confirm-button").hasClass("hidden") ) ;
+  else $("#confirm-button").addClass("hidden");
+  console.log("dialog close function");
+  $(this).find("img").remove();
+  $("#uploadForm").off("submit", submitHandler);
+  $("#upload-button").off();
+  $("#confirm-button").off();
+  });
+
+  // function to use in setInterval
+  var workFile = function()
+  {
     console.log($("#userPhotoInput").val());
     if ($("#userPhotoInput").val() !== '')
     {
       clearInterval(timerId);
       console.log("SUBMITTED");
+      $("#dialog").find("img").remove();
       $("#uploadForm").submit();
-    }}, 500);
+    }
+  };
 
-  // submit event listener
-  $("#uploadForm").submit(function(){
+  // Check for file
+  var timerId;
+  timerId = setInterval(workFile, 500);
 
+  var submitHandler = function()
+  {
    $(this).ajaxSubmit({
      error: function(xhr)
      {
@@ -103,6 +118,12 @@ function dialogWindow()
 
        $("#dialog").find("#upload-button").after(img);
        $("#dialog").find("#confirm-button").removeClass("hidden");
+
+       // now i want to be able to change the img
+       // $("#userPhotoInput").val("");       
+       // timerId = setInterval(workFile, 500);
+      
+
        $("#confirm-button").on("click", function(){
 	 /* canvas filled with img
 	 var canvas = $(".blueRct").get(0);
@@ -127,9 +148,10 @@ function dialogWindow()
 
 	 // close dialog
 	 $("#dialog").dialog("close");
+	 $("#userPhotoInput").val("");
 
-	 // img sent to server and edit html
-
+         // reset interval function
+         // clearInterval(timerId);
 
 	 // return to initial state
 	 initialMode();
@@ -139,7 +161,9 @@ function dialogWindow()
 
    // Stop the form for submitting so we avoid refresh
    return false;
- });
+ };
+  // submit event listener
+  $("#uploadForm").on("submit",submitHandler);
 
 
 }
