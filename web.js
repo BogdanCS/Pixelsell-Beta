@@ -48,10 +48,14 @@ app.listen(port, function()
 
 
 file = fs.createWriteStream(__dirname + '/public/index.html', {flags: "r+"});
-file.pos = 1326;
+file.pos = 1325;
 var fullPaths = [];
+var greenLight = true;
 
 var timerId = setInterval( function(){
+  if (greenLight)
+  { 
+  greenlight = false;
   var path = __dirname + '/tmp/forIndex/';
   fs.readdir(path, function(err, files){
     async.mapLimit(files,1000,function(filename,cb){cb(null, path+filename);}, function(err, results){
@@ -61,16 +65,21 @@ var timerId = setInterval( function(){
 	var writeCB = function(err, written, buffer)
 	  {
 	      console.log("written");
-              console.log(fullPaths[index]);
-	      file.pos = file.pos + results[index].length + 1;
+	      console.log(fullPaths[index]);
+	      console.log("file.pos before:" + file.pos);
+	      file.pos = file.pos - "</body></html>".length;
+	      console.log("file.pos before:" + file.pos);
+	      console.log(results[index].toString().length);
 	      fs.unlink(fullPaths[index], function (err) {if (err) throw err;
 							console.log("deleted");});
-              //tomorrow !! console.log (results.length);
+	      console.log (results.length);
 	      if (index + 1 < results.length)
 	      {
 		  index++;
 		  file.write(new Buffer(results[index] + "</body></html>"), writeCB);
 	      }
+              else // we make sure that we don't have two instances(setInterval) running at the same time
+                greenLight = true;
 	  };
 	var index = 0;
 	console.log("penis");
@@ -81,10 +90,11 @@ var timerId = setInterval( function(){
 	   console.log(file.pos);
 	   console.log(results[index]);
 	   console.log(writeCB);
-	  file.write(new Buffer(results[index] + "</body></html>"),writeCB);}
+	   file.write(new Buffer(results[index] + "</body></html>"),writeCB);}
 
 
     });
    });
   });
+  }
 },1000);
