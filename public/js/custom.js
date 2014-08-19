@@ -96,6 +96,7 @@ function dialogWindow()
       clearInterval(timerId);
       console.log("SUBMITTED");
       $("#dialog").find("img").remove();
+      $("#confirm-button").off();
       $("#uploadForm").submit();
     }
   };
@@ -120,8 +121,8 @@ function dialogWindow()
        $("#dialog").find("#confirm-button").removeClass("hidden");
 
        // now i want to be able to change the img
-       // $("#userPhotoInput").val("");       
-       // timerId = setInterval(workFile, 500);
+        $("#userPhotoInput").val("");       
+        timerId = setInterval(workFile, 500);
       
 
        $("#confirm-button").on("click", function(){
@@ -151,7 +152,7 @@ function dialogWindow()
 	 $("#userPhotoInput").val("");
 
          // reset interval function
-         // clearInterval(timerId);
+         clearInterval(timerId);
 
 	 // return to initial state
 	 initialMode();

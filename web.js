@@ -76,10 +76,16 @@ var timerId = setInterval( function(){
 	    console.log("file.pos before updating:" + file.pos);
 	    file.pos = file.pos - "</body></html>".length;
             console.log ("filePosBackup: " + filePosBackup);
+            
+            // Backup file.pos
+            filePosBackup.pos = 0;
 	    filePosBackup.write(new Buffer(file.pos + ""), function (err, written, buffer){
 	      if (err) console.log ("backupVariables fail");
 	      else console.log("Written to bV: " + written + buffer);});
+
 	    console.log(results[index].toString().length);
+
+            // After processing delete the temp file
 	    fs.unlink(fullPaths[index], function (err) {if (err) throw err;
 						      console.log("deleted");});
 	    console.log (results.length);
