@@ -1,3 +1,87 @@
+function Point (requiredX, requiredY)
+{
+  this.xAxis = requiredX;
+  this.yAxis = requiredY;
+  this.inside = function (rectangle)
+  {
+    if (rectangle instanceof Rectangle)
+      return this.xAxis > rectangle.upperLeft.xAxis && this.xAxis < rectangle.bottomRight.xAxis &&
+	     this.yAxis < rectangle.upperLeft.yAxis && this.yAxis > rectangle.bottomRight.yAxis;
+      //here a callback may be needed
+    else
+      console.log ("Please supply a Rectangle");
+  };
+}
+
+// Takes two Points
+function Rectangle (requiredUL, requiredBR)
+{
+  if (requiredUL instanceof Point && requiredBR instanceof Point)
+  {
+    this.upperLeft = requiredUL;
+    this.bottomRight = requiredBR;
+
+    //this.upperRight = new Point(upperLeft.yAxis, bottomRight.xAxis);
+    //this.bottomLeft = new Point(upperLeft.xAxis, bottomRight.yAxis);
+  }
+  else
+    console.log("Please supply two points: " + requiredUL + "," + requiredBR);
+
+  this.collide = function (rectangle, cb)
+  {
+    var colliding = true;
+    console.log(rectangle);
+    console.log(rectangle.upperLeft.xAxis + "," + rectangle.upperLeft.yAxis + "," + rectangle.bottomRight.xAxis + "," + rectangle.bottomRight.yAxis);
+    console.log(this.upperLeft.xAxis + "," + this.upperLeft.yAxis + "," + this.bottomRight.xAxis + "," + this.bottomRight.yAxis);
+    // If one rectangle it's over ther other than they don't collide
+    if (this.upperLeft.yAxis > rectangle.bottomRight.yAxis ||
+	rectangle.upperLeft.yAxis > this.bottomRight.yAxis)
+      colliding = false;
+
+    // Analog for left direction
+    if (this.upperLeft.xAxis > rectangle.bottomRight.xAxis ||
+	rectangle.upperLeft.xAxis > this.bottomRight.xAxis)
+      colliding = false;
+
+    if (colliding)
+    {
+     var redUpperLeft,redBottomRight;
+     console.log("colliding");
+     if (this.upperLeft.inside(rectangle))
+       redUpperLeft = this.upperLeft;
+     else if (this.upperLeft.yAxis < rectangle.upperLeft.yAxis &&
+	      this.upperLeft.xAxis < rectangle.upperLeft.xAxis)
+       redUpperLeft = rectangle.upperLeft;
+     else if (this.upperLeft.yAxis < rectangle.upperLeft.yAxis)
+       redUpperLeft = new Point(this.upperLeft.xAxis, rectangle.upperLeft.yAxis);
+     else
+       redUpperLeft = new Point(rectangle.upperLeft.xAxis,this.upperLeft.yAxis);
+
+     if (this.bottomRight.inside(rectangle))
+       redBottomRight = this.bottomRight;
+     else if (this.bottomRight.yAxis > rectangle.bottomRight.yAxis &&
+	      this.bottomRight.xAxis > rectangle.bottomRight.xAxis)
+       redBottomRight = rectangle.bottomRight;
+     else if (this.bottomRight.yAxis > rectangle.bottomRight.yAxis)
+       redBottomRight = new Point(this.bottomRight.xAxis, rectangle.bottomRight.yAxis);
+     else
+       redBottomRight = new Point (rectangle.bottomRight.xAxis, this.bottomRight.yAxis);
+
+     // return new Rectangle (red)
+     cb (new Error(new Rectangle(redUpperLeft, redBottomRight)), 0);
+    }
+    else
+     cb (null, 0);
+  }; // collide
+}
+
+////////////////////// above code should be moved in geometry.js
+
+// function collision (
+// We will store all the images as Rectangles
+var images;
+// var redRect
+
 function startDraw (evt)
 {
   $(".blueRct").remove();
@@ -11,6 +95,9 @@ function startDraw (evt)
   $("#priceCount").find("h2").remove();
   $("#cnt-button").prop('disabled', true);
 
+  var currentRctObj = new Rectangle(new Point(0,0),new Point(0,0));
+  // to move here currentRct for efficiency
+
   function updateDraw (evt2)
   {
     var x2Position = evt2.pageX;
@@ -23,25 +110,55 @@ function startDraw (evt)
 								 height: heightRct});
 
     if (x2Position >= x1Position && y2Position >= y1Position)
-     currentRct.css({'top' : y1Position,
-		     'left': x1Position,
+    {
+      currentRct.css({'top' : y1Position,
+      		     'left': x1Position,
 		     'right': 'auto',
 		     'bottom': 'auto'});
+      currentRctObj.upperLeft = new Point(x1Position, y1Position);
+      currentRctObj.bottomRight = new Point(x2Position, y2Position);
+    }
     else if (x2Position < x1Position && y2Position >= y1Position)
+    {
       currentRct.css({'top' : y1Position,
 		      'left': 'auto',
 		      'right': $(window).width() - x1Position,
 		      'bottom': 'auto'});
+      currentRctObj.upperLeft = new Point(x2Position, y1Position);
+      currentRctObj.bottomRight = new Point(x1Position, y2Position);
+    }
     else if (x2Position >= x1Position && y2Position < y1Position)
+    {
       currentRct.css({'top' : 'auto',
 		      'left': x1Position,
 		      'right': 'auto',
 		      'bottom': $(window).height() - y1Position});
+      currentRctObj.upperLeft = new Point(x1Position, y2Position);
+      currentRctObj.bottomRight = new Point(x2Position, y1Position);
+    }
     else
+    {
        currentRct.css({'top' : 'auto',
 		       'left': 'auto',
 		       'right': $(window).width() - x1Position,
 		       'bottom': $(window).height() - y1Position});
+      currentRctObj.upperLeft = new Point(x2Position, y2Position);
+      currentRctObj.bottomRight = new Point(x1Position, y1Position);
+    }
+
+    // Search for collisions between currentRctObj and images
+    async.mapLimit(images, 1024,currentRctObj.collide.bind(currentRctObj), function (err, results)
+    {
+	if (err)
+	{
+          console.log(err);
+          console.log(results);
+	  var redRect = err.message;
+	  console.log ("redRect: " + redRect.upperLeft.xAxis);
+	}
+	else
+	  console.log ("hmmm");
+    });
 
     $(".blueRct").remove();
     $("#select").append(currentRct);
@@ -121,9 +238,9 @@ function dialogWindow()
        $("#dialog").find("#confirm-button").removeClass("hidden");
 
        // now i want to be able to change the img
-        $("#userPhotoInput").val("");       
-        timerId = setInterval(workFile, 500);
-      
+	$("#userPhotoInput").val("");
+	timerId = setInterval(workFile, 500);
+
 
        $("#confirm-button").on("click", function(){
 	 /* canvas filled with img
@@ -151,8 +268,8 @@ function dialogWindow()
 	 $("#dialog").dialog("close");
 	 $("#userPhotoInput").val("");
 
-         // reset interval function
-         clearInterval(timerId);
+	 // reset interval function
+	 clearInterval(timerId);
 
 	 // return to initial state
 	 initialMode();
@@ -171,6 +288,17 @@ function dialogWindow()
 
 function selectMode()
 {
+  // Find all user images and create rectangles
+  var imagesJQ = $("body").children("img");
+  var imagesArr = imagesJQ.toArray();
+
+  async.mapLimit(imagesArr, 1024, function(img,cb){
+    var upperLeft = new Point(img.offsetLeft, img.offsetTop);
+    var bottomRight = new Point(img.offsetLeft + img.offsetWidth, img.offsetTop + img.offsetHeight);
+    var rectangle = new Rectangle(upperLeft, bottomRight);
+    cb(null, rectangle);
+    }, function (err, results) {images = results;});
+
   // Show instructions
   $("#cnt").removeClass("hidden");
   $("#select").addClass("select-screen");
