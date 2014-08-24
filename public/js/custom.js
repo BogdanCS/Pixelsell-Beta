@@ -34,17 +34,21 @@ function Rectangle (requiredUL, requiredBR)
     console.log(rectangle.upperLeft.xAxis + "," + rectangle.upperLeft.yAxis + "," + rectangle.bottomRight.xAxis + "," + rectangle.bottomRight.yAxis);
     console.log(this.upperLeft.xAxis + "," + this.upperLeft.yAxis + "," + this.bottomRight.xAxis + "," + this.bottomRight.yAxis);
     // If one rectangle it's over ther other than they don't collide
-    if (this.upperLeft.yAxis > rectangle.bottomRight.yAxis ||
-	rectangle.upperLeft.yAxis > this.bottomRight.yAxis)
+    // to check if 4 is the right value
+    // canvas might be responsive now (wrong)!!
+
+    if (this.upperLeft.yAxis > rectangle.bottomRight.yAxis + 4 ||
+	rectangle.upperLeft.yAxis > this.bottomRight.yAxis + 4)
       colliding = false;
 
     // Analog for left direction
-    if (this.upperLeft.xAxis > rectangle.bottomRight.xAxis ||
-	rectangle.upperLeft.xAxis > this.bottomRight.xAxis)
+    if (this.upperLeft.xAxis > rectangle.bottomRight.xAxis + 4 ||
+	rectangle.upperLeft.xAxis > this.bottomRight.xAxis + 4)
       colliding = false;
 
     if (colliding)
     {
+     /*
      var redUpperLeft,redBottomRight;
      console.log("colliding");
      if (this.upperLeft.inside(rectangle))
@@ -68,10 +72,12 @@ function Rectangle (requiredUL, requiredBR)
        redBottomRight = new Point (rectangle.bottomRight.xAxis, this.bottomRight.yAxis);
 
      // return new Rectangle (red)
-     cb (new Error(new Rectangle(redUpperLeft, redBottomRight)), 0);
+     console.log("wtf");
+     redRct.push(new Rectangle(redUpperLeft, redBottomRight));*/
+     cb (new Error("Colliding"), 0);
     }
     else
-     cb (null, 0);
+      cb (null, 0);
   }; // collide
 }
 
@@ -80,7 +86,7 @@ function Rectangle (requiredUL, requiredBR)
 // function collision (
 // We will store all the images as Rectangles
 var images;
-// var redRect
+var redRct = [];
 
 function startDraw (evt)
 {
@@ -146,29 +152,53 @@ function startDraw (evt)
       currentRctObj.bottomRight = new Point(x1Position, y1Position);
     }
 
+    var drawGreenLight = true;
     // Search for collisions between currentRctObj and images
+    //redRct = [];
+    console.log(images);
     async.mapLimit(images, 1024,currentRctObj.collide.bind(currentRctObj), function (err, results)
     {
-	if (err)
-	{
-          console.log(err);
-          console.log(results);
-	  var redRect = err.message;
-	  console.log ("redRect: " + redRect.upperLeft.xAxis);
-	}
-	else
-	  console.log ("hmmm");
+      if (err)
+      {
+	currentRct.removeClass("blueRct");
+	currentRct.addClass("redRct");
+      }
+
+
+      //console.log(redRct);
+      /*var canvas = currentRct.get(0);
+      var ctx = canvas.getContext("2d");
+      async.mapLimit(redRct, 1024, function (rectangle,cb){
+      console.log(rectangle);
+      relXUL = rectangle.upperLeft.xAxis - currentRctObj.upperLeft.xAxis;
+      relYUL = rectangle.upperLeft.yAxis - currentRctObj.upperLeft.yAxis;
+      relXBR = rectangle.bottomRight.xAxis - currentRctObj.upperLeft.xAxis;
+      relYUL = rectangle.bottomRight.yAxis - currentRctObj.upperLeft.yAxis;
+      ctx.rect(relXUL,relYUL,relXBR,relYUL);
+      ctx.fillStyle = "red";
+      ctx.fill();*/
+      /*
+      if(redRct[0] !== null)
+      drawGreenLight = false;
+      cb(null, 0); //}
+     // , function (err, results){console.log("success");});
+    */
     });
 
+    //if (drawGreenLight){
     $(".blueRct").remove();
+    $(".redRct").remove();
     $("#select").append(currentRct);
-
+//}
     priceTag.text((widthRct * heightRct * price) +"$");
     $("#priceCount").find("h2").remove();
     $("#priceCount").append(priceTag);
 
-    //Enable button
-    $("#cnt-button").prop('disabled', false);
+    //Enable button if selection is valid
+    if (currentRct.hasClass("blueRct"))
+      $("#cnt-button").prop('disabled', false);
+    else
+      $("#cnt-button").prop('disabled', true);
 
     // to add blocking stuff
   }
