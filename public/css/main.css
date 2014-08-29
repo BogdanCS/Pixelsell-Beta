@@ -3,6 +3,10 @@ body {
   width: 100%;
   height: 100%;
   -webkit-background-size: cover;
+  -moz-user-select: -moz-none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-select: none;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
@@ -11,6 +15,10 @@ body {
 div.select-screen {
    cursor: crosshair;
    position:absolute;
+   -moz-user-select: -moz-none;
+   -ms-user-select: none;
+   user-select: none;
+   -webkit-user-select: none;
    top: 0%;
    left: 0%;
    width: 100%;
@@ -35,9 +43,16 @@ h2.hidden {
        }
 
 .blueRct {
-  background-color:#9aaeff; 
+  background-color: #9aaeff; 
   border-style: solid;
   border-color: #3b6ccd;
+  position: absolute;
+       }
+
+.redRct {
+  background-color: #CD5555; 
+  border-style: solid;
+  border-color: #FF0000;
   position: absolute;
        }
 
@@ -47,6 +62,9 @@ h2.hidden {
   bottom : 0%;
        }
 
+.placeHolder {
+  background-color: #D3D3D3;
+}
 
 
 
