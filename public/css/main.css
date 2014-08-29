@@ -62,9 +62,9 @@ h2.hidden {
   bottom : 0%;
        }
 
-img.blocking-cursor {
-  cursor: none;
-  z-index: 100;
-       }
+.placeHolder {
+  background-color: #D3D3D3;
+}
+
 
 

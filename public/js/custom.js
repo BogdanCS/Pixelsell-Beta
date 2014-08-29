@@ -1,99 +1,11 @@
-function Point (requiredX, requiredY)
-{
-  this.xAxis = requiredX;
-  this.yAxis = requiredY;
-  this.inside = function (rectangle)
-  {
-    if (rectangle instanceof Rectangle)
-      return this.xAxis > rectangle.upperLeft.xAxis && this.xAxis < rectangle.bottomRight.xAxis &&
-	     this.yAxis < rectangle.upperLeft.yAxis && this.yAxis > rectangle.bottomRight.yAxis;
-      //here a callback may be needed
-    else
-      console.log ("Please supply a Rectangle");
-  };
-}
-
-// Takes two Points
-function Rectangle (requiredUL, requiredBR)
-{
-  if (requiredUL instanceof Point && requiredBR instanceof Point)
-  {
-    this.upperLeft = requiredUL;
-    this.bottomRight = requiredBR;
-
-    //this.upperRight = new Point(upperLeft.yAxis, bottomRight.xAxis);
-    //this.bottomLeft = new Point(upperLeft.xAxis, bottomRight.yAxis);
-  }
-  else
-    console.log("Please supply two points: " + requiredUL + "," + requiredBR);
-
-  this.collide = function (rectangle, cb)
-  {
-    var colliding = true;
-    console.log(rectangle);
-    console.log(rectangle.upperLeft.xAxis + "," + rectangle.upperLeft.yAxis + "," + rectangle.bottomRight.xAxis + "," + rectangle.bottomRight.yAxis);
-    console.log(this.upperLeft.xAxis + "," + this.upperLeft.yAxis + "," + this.bottomRight.xAxis + "," + this.bottomRight.yAxis);
-    // If one rectangle it's over ther other than they don't collide
-    // to check if 4 is the right value
-    // canvas might be responsive now (wrong)!!
-
-    if (this.upperLeft.yAxis > rectangle.bottomRight.yAxis + 4 ||
-	rectangle.upperLeft.yAxis > this.bottomRight.yAxis + 4)
-      colliding = false;
-
-    // Analog for left direction
-    if (this.upperLeft.xAxis > rectangle.bottomRight.xAxis + 4 ||
-	rectangle.upperLeft.xAxis > this.bottomRight.xAxis + 4)
-      colliding = false;
-
-    if (colliding)
-    {
-     /*
-     var redUpperLeft,redBottomRight;
-     console.log("colliding");
-     if (this.upperLeft.inside(rectangle))
-       redUpperLeft = this.upperLeft;
-     else if (this.upperLeft.yAxis < rectangle.upperLeft.yAxis &&
-	      this.upperLeft.xAxis < rectangle.upperLeft.xAxis)
-       redUpperLeft = rectangle.upperLeft;
-     else if (this.upperLeft.yAxis < rectangle.upperLeft.yAxis)
-       redUpperLeft = new Point(this.upperLeft.xAxis, rectangle.upperLeft.yAxis);
-     else
-       redUpperLeft = new Point(rectangle.upperLeft.xAxis,this.upperLeft.yAxis);
-
-     if (this.bottomRight.inside(rectangle))
-       redBottomRight = this.bottomRight;
-     else if (this.bottomRight.yAxis > rectangle.bottomRight.yAxis &&
-	      this.bottomRight.xAxis > rectangle.bottomRight.xAxis)
-       redBottomRight = rectangle.bottomRight;
-     else if (this.bottomRight.yAxis > rectangle.bottomRight.yAxis)
-       redBottomRight = new Point(this.bottomRight.xAxis, rectangle.bottomRight.yAxis);
-     else
-       redBottomRight = new Point (rectangle.bottomRight.xAxis, this.bottomRight.yAxis);
-
-     // return new Rectangle (red)
-     console.log("wtf");
-     redRct.push(new Rectangle(redUpperLeft, redBottomRight));*/
-     cb (new Error("Colliding"), 0);
-    }
-    else
-      cb (null, 0);
-  }; // collide
-}
-
-////////////////////// above code should be moved in geometry.js
-
-// function collision (
 // We will store all the images as Rectangles
 var images;
-var redRct = [];
 
 function startDraw (evt)
 {
   $(".blueRct").remove();
   var x1Position = evt.pageX;
   var y1Position = evt.pageY;
-  //alert ("Click position is " + x1Position + "," +  y1Position);
 
   // Reset from previous draw
   var price = 1; //to update - growing price
@@ -152,10 +64,8 @@ function startDraw (evt)
       currentRctObj.bottomRight = new Point(x1Position, y1Position);
     }
 
-    var drawGreenLight = true;
+    
     // Search for collisions between currentRctObj and images
-    //redRct = [];
-    console.log(images);
     async.mapLimit(images, 1024,currentRctObj.collide.bind(currentRctObj), function (err, results)
     {
       if (err)
@@ -163,33 +73,13 @@ function startDraw (evt)
 	currentRct.removeClass("blueRct");
 	currentRct.addClass("redRct");
       }
-
-
-      //console.log(redRct);
-      /*var canvas = currentRct.get(0);
-      var ctx = canvas.getContext("2d");
-      async.mapLimit(redRct, 1024, function (rectangle,cb){
-      console.log(rectangle);
-      relXUL = rectangle.upperLeft.xAxis - currentRctObj.upperLeft.xAxis;
-      relYUL = rectangle.upperLeft.yAxis - currentRctObj.upperLeft.yAxis;
-      relXBR = rectangle.bottomRight.xAxis - currentRctObj.upperLeft.xAxis;
-      relYUL = rectangle.bottomRight.yAxis - currentRctObj.upperLeft.yAxis;
-      ctx.rect(relXUL,relYUL,relXBR,relYUL);
-      ctx.fillStyle = "red";
-      ctx.fill();*/
-      /*
-      if(redRct[0] !== null)
-      drawGreenLight = false;
-      cb(null, 0); //}
-     // , function (err, results){console.log("success");});
-    */
     });
 
-    //if (drawGreenLight){
+    
     $(".blueRct").remove();
     $(".redRct").remove();
     $("#select").append(currentRct);
-//}
+
     priceTag.text((widthRct * heightRct * price) +"$");
     $("#priceCount").find("h2").remove();
     $("#priceCount").append(priceTag);
@@ -199,8 +89,6 @@ function startDraw (evt)
       $("#cnt-button").prop('disabled', false);
     else
       $("#cnt-button").prop('disabled', true);
-
-    // to add blocking stuff
   }
 
   $("#select").on("mousemove", updateDraw);
@@ -221,27 +109,35 @@ function dialogWindow()
   $("#dialog").dialog("open");
   $("#upload-button").on("click", function(){$("#dialog").find("input").click();});
 
-  // To add - change uploaded file
+  // Canvas - place holder
+  var selectTool = $("canvas");
+  var fixedHeight = 200;
+  var width = fixedHeight * ( selectTool.width() / selectTool.height() );
+  var placeHolder = $("<canvas/>", {'class' : 'placeHolder'}).prop({width: width,
+								 height: fixedHeight});
+  $("#dialog").append(placeHolder);
+
 
   // close dialog function
   $("#dialog").on("dialogclose", function(evt, ui){
   if ( $("#confirm-button").hasClass("hidden") ) ;
   else $("#confirm-button").addClass("hidden");
-  console.log("dialog close function");
+  
   $(this).find("img").remove();
   $("#uploadForm").off("submit", submitHandler);
   $("#upload-button").off();
   $("#confirm-button").off();
+  $(this).find("canvas").remove();
   });
 
   // function to use in setInterval
   var workFile = function()
   {
-    console.log($("#userPhotoInput").val());
+    
     if ($("#userPhotoInput").val() !== '')
     {
       clearInterval(timerId);
-      console.log("SUBMITTED");
+      
       $("#dialog").find("img").remove();
       $("#confirm-button").off();
       $("#uploadForm").submit();
@@ -261,9 +157,14 @@ function dialogWindow()
      },
      success: function(response)
      {
-       console.log(response.path);
+       
        var img = $("<img src=" + response.path + "></img>");
+       var placeHolder = $(".placeHolder");
+       img.width(placeHolder.width());
+       img.height(placeHolder.height());
 
+
+       placeHolder.remove();
        $("#dialog").find("#upload-button").after(img);
        $("#dialog").find("#confirm-button").removeClass("hidden");
 
@@ -273,14 +174,6 @@ function dialogWindow()
 
 
        $("#confirm-button").on("click", function(){
-	 /* canvas filled with img
-	 var canvas = $(".blueRct").get(0);
-	 var ctx = canvas.getContext("2d");
-	 var pat = ctx.createPattern(img.get(0), 'no-repeat');
-	 ctx.rect(0,0,$(".blueRct").width(),$(".blueRct").height());
-	 ctx.fillStyle = pat;
-	 ctx.fill();*/
-
 	 // replace blueRct with img
 	 canvas = $(".blueRct");
 	 img.css({"position":"absolute",
@@ -359,13 +252,14 @@ function initialMode()
   $("#cnt").addClass("hidden");
   $("#select").removeClass("select-screen");
 
-  $("#cnt-button").addClass("btn-primary");
-  $("#cnt-button").removeClass("btn-success");
-  $("#cnt-button").text("Take a chunk");
-  $("#cnt-button").prop('disabled', false);
+  var cntButton = $("#cnt-button");
+  cntButton.addClass("btn-primary");
+  cntButton.removeClass("btn-success");
+  cntButton.text("Take a chunk");
+  cntButton.prop('disabled', false);
 
-  $("#cnt-button").on("click", selectMode);
-  $("#cnt-button").off("click", dialogWindow);
+  cntButton.on("click", selectMode);
+  cntButton.off("click", dialogWindow);
 
   $("#select").off("mousedown", startDraw);
 
