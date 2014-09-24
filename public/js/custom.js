@@ -64,7 +64,7 @@ function startDraw (evt)
       currentRctObj.bottomRight = new Point(x1Position, y1Position);
     }
 
-    
+
     // Search for collisions between currentRctObj and images
     async.mapLimit(images, 1024,currentRctObj.collide.bind(currentRctObj), function (err, results)
     {
@@ -75,7 +75,7 @@ function startDraw (evt)
       }
     });
 
-    
+
     $(".blueRct").remove();
     $(".redRct").remove();
     $("#select").append(currentRct);
@@ -107,6 +107,7 @@ function startDraw (evt)
 function dialogWindow()
 {
   $("#dialog").dialog("open");
+  $("#confirm-button").prop('disabled',true);
   $("#upload-button").on("click", function(){$("#dialog").find("input").click();});
 
   // Canvas - place holder
@@ -115,14 +116,17 @@ function dialogWindow()
   var width = fixedHeight * ( selectTool.width() / selectTool.height() );
   var placeHolder = $("<canvas/>", {'class' : 'placeHolder'}).prop({width: width,
 								 height: fixedHeight});
-  $("#dialog").append(placeHolder);
+  placeHolder.css({'display' : 'block',
+                   'margin-left' : 'auto',
+                   'margin-right' : 'auto'});
+  $("#upload-button").before(placeHolder);
 
 
   // close dialog function
   $("#dialog").on("dialogclose", function(evt, ui){
-  if ( $("#confirm-button").hasClass("hidden") ) ;
-  else $("#confirm-button").addClass("hidden");
-  
+  //if ( $("#confirm-button").hasClass("hidden") ) ;
+  //else $("#confirm-button").addClass("hidden");
+  placeHolder.remove();
   $(this).find("img").remove();
   $("#uploadForm").off("submit", submitHandler);
   $("#upload-button").off();
@@ -133,11 +137,11 @@ function dialogWindow()
   // function to use in setInterval
   var workFile = function()
   {
-    
+
     if ($("#userPhotoInput").val() !== '')
     {
       clearInterval(timerId);
-      
+
       $("#dialog").find("img").remove();
       $("#confirm-button").off();
       $("#uploadForm").submit();
@@ -157,16 +161,18 @@ function dialogWindow()
      },
      success: function(response)
      {
-       
+
        var img = $("<img src=" + response.path + "></img>");
        var placeHolder = $(".placeHolder");
        img.width(placeHolder.width());
        img.height(placeHolder.height());
+       img.css({'display' : 'block',
+                   'margin-left' : 'auto',
+                   'margin-right' : 'auto'});
 
-
-       placeHolder.remove();
-       $("#dialog").find("#upload-button").after(img);
-       $("#dialog").find("#confirm-button").removeClass("hidden");
+       placeHolder.css({'display':'none'});
+       $("#dialog").find("#upload-button").before(img);
+       $("#dialog").find("#confirm-button").prop('disabled', false);
 
        // now i want to be able to change the img
 	$("#userPhotoInput").val("");
@@ -282,7 +288,9 @@ $(document).ready(function (){
   $("#cnt-button").prop('disabled', false);
   $( "#dialog" ).dialog({ autoOpen: false,
 			  modal: true,
-			  draggable: true});
+			  draggable: true,
+                          height: 'auto',
+                          width: 'auto'});
 
   $("#cnt-button").on("click", selectMode);
   $("#userPhotoInput").val('');

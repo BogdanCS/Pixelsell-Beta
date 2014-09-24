@@ -33,9 +33,26 @@ div.select-screen {
   z-index: 100; 
       }
 
+.btn-success{
+  background-color: #44c767;
+  }
+
 #cnt {
   position: absolute;
-  left: 50%;
+  left: 48%;
+  background-color:#44c767;
+  -moz-border-radius:28px;
+  -webkit-border-radius:28px;
+  border-radius:28px;
+  border:1px solid #18ab29;
+  display:inline-block;
+  cursor:pointer;
+  color:#ffffff;
+  font-family:arial;
+  font-size:22px;
+  padding:16px 31px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #2f6627;
      }
 
 h2.hidden {
@@ -60,6 +77,15 @@ h2.hidden {
   position: absolute;
   right : 0%;
   bottom : 0%;
+  
+  display:inline-block;
+  cursor:pointer;
+  color:#FF9900;
+  font-family:arial;
+  font-size:25px;
+  padding:16px 31px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #2f6627;
        }
 
 .placeHolder {
@@ -67,4 +93,16 @@ h2.hidden {
 }
 
 
+#upload-button {
+  margin-left: 1%;
+  margin-right: auto;
+  width: 48%;}
 
+#confirm-button {
+  margin-left: auto;
+  margin-right: auto;
+  width: 48%;
+
+#dialog.ui-dialog-titlebar {
+  background-color: #3b6cc;
+   }
