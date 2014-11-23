@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="css/bootstrap.css">
+     <link rel="stylesheet" href="css/animated-border.css">
+     <link rel="stylesheet" href="css/main.css">
+     <link rel="stylesheet" href="css/jquery-ui.min.css>
+  </head>
+
+  <body>
+    <div id="select"></div>
+    <h2 class="hidden" id="cnt">Select an area</h2>
+    <button type="button" class="btn btn-primary btn-lg center-block" id="cnt-button">Take a chunk</button>
+    <div id="priceCount"></div>
+    <script src="/js/jquery-1.11.1.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <!--<script src="/js/jquery.animatedborder.min.js"></script>-->
+    <script src="/js/custom.js"></script>
+
+  </body>
+</html>

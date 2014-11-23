@@ -1,0 +1,47 @@
+body {
+  background: url(/img/back.jpg) no-repeat center center fixed;
+  width: 100%;
+  height: 100%;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+     }
+
+div.select-screen {
+   cursor: crosshair;
+   position:absolute;
+   top: 0%;
+   left: 0%;
+   width: 100%;
+   height: 100%;
+   z-index: 999;
+              } 
+
+#cnt-button {
+  position: absolute;
+  top: 80%;
+  left: 50%; 
+      }
+
+#cnt {
+  position: absolute;
+  left: 50%;
+     }
+
+h2.hidden {
+  visibility: hidden;
+       }
+
+.blueRct {
+  background-color:#9aaeff; 
+  border-style: solid;
+  border-color: #3b6ccd;
+  position: absolute;
+       }
+
+#priceCount {
+  position: absolute;
+  right : 0%;
+  bottom : 0%;
+       }
